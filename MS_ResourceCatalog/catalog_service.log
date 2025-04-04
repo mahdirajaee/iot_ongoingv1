@@ -1,0 +1,15 @@
+2025-03-31 16:05:54,333 - CatalogService - INFO - Starting Resource Catalog service with Python 3.13.1 (v3.13.1:06714517797, Dec  3 2024, 14:00:22) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-31 16:05:54,333 - CatalogService - INFO - Using storage file: registry_data.json
+2025-03-31 16:05:54,334 - cherrypy.error - INFO - [31/Mar/2025:16:05:54] ENGINE Bus STARTING
+2025-03-31 16:05:54,334 - cherrypy.error - INFO - [31/Mar/2025:16:05:54] ENGINE Started monitor thread 'Autoreloader'.
+2025-03-31 16:05:54,443 - cherrypy.error - INFO - [31/Mar/2025:16:05:54] ENGINE Serving on http://127.0.0.1:8080
+2025-03-31 16:05:54,444 - cherrypy.error - INFO - [31/Mar/2025:16:05:54] ENGINE Bus STARTED
+2025-03-31 16:05:54,444 - CatalogService - INFO - Resource Catalog service started on http://0.0.0.0:8080
+2025-03-31 16:06:01,733 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Keyboard Interrupt: shutting down bus
+2025-03-31 16:06:01,733 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus STOPPING
+2025-03-31 16:06:01,969 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE HTTP Server cherrypy._cpwsgi_server.CPWSGIServer(('127.0.0.1', 8080)) shut down
+2025-03-31 16:06:01,969 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Stopped thread 'Autoreloader'.
+2025-03-31 16:06:01,969 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus STOPPED
+2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus EXITING
+2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus EXITED
+2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Waiting for child threads to terminate...

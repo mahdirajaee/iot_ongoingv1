@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart IoT Bolt System</title>
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/pipeline-visualization.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MQTT Client for WebSocket connection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+    <!-- Added for better date handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/logo.svg" alt="Smart IoT Bolt Logo" class="sidebar-logo">
+                <h2>Smart IoT Bolt</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul id="main-nav">
+                    <li class="active" data-section="overview">
+                        <a href="#overview">
+                            <i class="fas fa-th-large"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li data-section="sensors">
+                        <a href="#sensors">
+                            <i class="fas fa-microchip"></i>
+                            <span>Sensors</span>
+                        </a>
+                    </li>
+                    <li data-section="analytics">
+                        <a href="#analytics">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li data-section="alerts">
+                        <a href="#alerts">
+                            <i class="fas fa-bell"></i>
+                            <span>Alerts</span>
+                            <span class="alert-badge" id="alertCountBadge">0</span>
+                        </a>
+                    </li>
+                    <li data-section="controls">
+                        <a href="#controls">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Controls</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div id="connectionStatus" class="connection-status">
+                    <span class="status-indicator offline"></span>
+                    <span id="statusText">Disconnected</span>
+                </div>
+                <a href="#" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navigation Bar -->
+            <header class="top-nav">
+                <div class="top-nav-left">
+                    <button id="sidebarToggle" class="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div id="pageTitle" class="page-title">Dashboard Overview</div>
+                </div>
+                
+                <div class="top-nav-right">
+                    <div class="top-nav-icons">
+                        <button class="icon-button" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">0</span>
+                        </button>
+                        
+                        <div class="user-menu">
+                            <button class="user-menu-btn" id="userMenuBtn">
+                                <div class="user-avatar" id="userAvatar">JD</div>
+                                <span class="user-name" id="userName">User</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown">
+                                <a href="#" id="userLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Sections Container -->
+            <div class="dashboard-sections">
+                <!-- Overview Section -->
+                <section id="overview" class="dashboard-section active">
+                    <div class="section-header">
+                        <h2>System Overview</h2>
+                        <div class="section-controls">
+                            <button class="refresh-btn" id="refreshData">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <select class="time-range-select" id="timeRangeSelector">
+                                <option value="1h">Last Hour</option>
+                                <option value="24h" selected>Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="stats-cards">
+                        <div class="stat-card" id="tempCard">
+                            <div class="stat-icon temperature">
+                                <i class="fas fa-temperature-high"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Temperature</h3>
+                                <div class="stat-value" id="tempValue">--°C</div>
+                                <div class="stat-change" id="tempChange">--</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" id="pressureCard">
+                            <div class="stat-icon pressure">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Pressure</h3>
+                                <div class="stat-value" id="pressureValue">-- kPa</div>
+                                <div class="stat-change" id="pressureChange">--</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" id="valveCard">
+                            <div class="stat-icon valves">
+                                <i class="fas fa-sliders-h"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Valve Status</h3>
+                                <div class="stat-value" id="valveStatus">--</div>
+                                <div class="stat-note" id="valveNote">--</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" id="alertCard">
+                            <div class="stat-icon alerts">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Active Alerts</h3>
+                                <div class="stat-value" id="alertCount">0</div>
+                                <div class="stat-change" id="alertChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Sensor Data</h3>
+                            <div class="chart-actions">
+                                <select id="chartDataSelect" class="chart-select">
+                                    <option value="temperature">Temperature</option>
+                                    <option value="pressure">Pressure</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart" id="overviewChart"></div>
+                    </div>
+                    
+                    <!-- Recent Alerts -->
+                    <div class="recent-alerts">
+                        <div class="section-sub-header">
+                            <h3>Recent Alerts</h3>
+                            <a href="#alerts" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        
+                        <div class="alerts-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentAlertsList">
+                                    <!-- Alert items will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Sensors Section -->
+                <section id="sensors" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Sensors Management</h2>
+                        <div class="section-controls">
+                            <div class="filter-container">
+                                <select id="sensorTypeFilter" class="filter-select">
+                                    <option value="all">All Types</option>
+                                    <option value="temperature">Temperature</option>
+                                    <option value="pressure">Pressure</option>
+                                </select>
+                                <select id="sensorStatusFilter" class="filter-select">
+                                    <option value="all">All Statuses</option>
+                                    <option value="online">Online</option>
+                                    <option value="offline">Offline</option>
+                                </select>
+                            </div>
+                            <button class="refresh-btn" id="refreshSensors">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sensor Map -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Pipeline Visualization</h3>
+                        </div>
+                        <div class="sensor-map" id="sensorMap">
+                            <div class="pipeline-visualization">
+                                <div class="pipeline-section" data-section="sectionA">
+                                    <div class="section-label">Section A</div>
+                                    <div class="section-pipe">
+                                        <div class="sensor-point" data-sensor-id="A1" data-type="temperature" data-status="online"></div>
+                                        <div class="sensor-point" data-sensor-id="A2" data-type="pressure" data-status="online"></div>
+                                        <div class="valve-point" data-valve-id="VA1" data-status="open"></div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-section" data-section="sectionB">
+                                    <div class="section-label">Section B</div>
+                                    <div class="section-pipe">
+                                        <div class="sensor-point" data-sensor-id="B1" data-type="temperature" data-status="online"></div>
+                                        <div class="sensor-point" data-sensor-id="B2" data-type="pressure" data-status="online"></div>
+                                        <div class="valve-point" data-valve-id="VB1" data-status="closed"></div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-section" data-section="sectionC">
+                                    <div class="section-label">Section C</div>
+                                    <div class="section-pipe">
+                                        <div class="sensor-point" data-sensor-id="C1" data-type="pressure" data-status="online"></div>
+                                        <div class="sensor-point" data-sensor-id="C2" data-type="temperature" data-status="online"></div>
+                                        <div class="valve-point" data-valve-id="VC1" data-status="open"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="map-legend">
+                                <div class="legend-item"><span class="legend-dot temperature-online"></span> Temperature</div>
+                                <div class="legend-item"><span class="legend-dot pressure-online"></span> Pressure</div>
+                                <div class="legend-item"><span class="legend-dot sensor-offline"></span> Offline</div>
+                                <div class="legend-item"><span class="legend-dot valve-open"></span> Valve (Open)</div>
+                                <div class="legend-item"><span class="legend-dot valve-closed"></span> Valve (Closed)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sensors Table -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Sensors List</h3>
+                            <div class="search-filter">
+                                <input type="text" id="sensorSearch" placeholder="Search sensors...">
+                            </div>
+                        </div>
+                        <div class="sensor-table-container">
+                            <table class="sensor-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Last Reading</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sensorsList">
+                                    <!-- Sensor items will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Analytics Section -->
+                <section id="analytics" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Analytics & Insights</h2>
+                        <div class="section-controls">
+                            <select class="time-range-select" id="analyticsTimeRange">
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d" selected>Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Performance Trends</h3>
+                            <div class="chart-actions">
+                                <select id="performanceMetricSelect" class="chart-select">
+                                    <option value="temperature">Temperature</option>
+                                    <option value="pressure">Pressure</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart" id="performanceChart"></div>
+                    </div>
+                    
+                    <!-- Anomaly Detection -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Anomaly Detection</h3>
+                        </div>
+                        <div class="chart" id="anomalyChart"></div>
+                    </div>
+                    
+                    <!-- Insights -->
+                    <div class="insights-container">
+                        <div class="chart-header">
+                            <h3>AI-Powered Insights</h3>
+                        </div>
+                        <div class="insights-cards" id="insightsContainer">
+                            <!-- Insight cards will be dynamically added here -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Alerts Section -->
+                <section id="alerts" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Alerts Management</h2>
+                        <div class="section-controls">
+                            <div class="filter-container">
+                                <select id="alertTypeFilter" class="filter-select">
+                                    <option value="all">All Types</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="warning">Warning</option>
+                                    <option value="info">Info</option>
+                                </select>
+                                <select id="alertStatusFilter" class="filter-select">
+                                    <option value="all">All Statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                            <button class="refresh-btn" id="refreshAlerts">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Alert Stats -->
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #ef4444;">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Critical Alerts</h3>
+                                <div class="stat-value" id="criticalAlertCount">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #f59e0b;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Warning Alerts</h3>
+                                <div class="stat-value" id="warningAlertCount">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #3b82f6;">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Info Alerts</h3>
+                                <div class="stat-value" id="infoAlertCount">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #10b981;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Resolved Today</h3>
+                                <div class="stat-value" id="resolvedAlertCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alerts Table -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Alert Log</h3>
+                            <div class="search-filter">
+                                <input type="text" id="alertSearch" placeholder="Search alerts...">
+                            </div>
+                        </div>
+                        <div class="alerts-table-container">
+                            <table class="alerts-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Message</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alertsList">
+                                    <!-- Alert items will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Controls Section -->
+                <section id="controls" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Control Center</h2>
+                        <div class="section-controls">
+                            <button class="refresh-btn" id="refreshControls">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Control Dashboard -->
+                    <div class="valve-control-container">
+                        <div class="chart-header">
+                            <h3>Valve Control Panel</h3>
+                        </div>
+                        <div class="valve-status-overview">
+                            <div class="valve-status-item">
+                                <span class="valve-status-label">Valves Open:</span>
+                                <span class="valve-status-value" id="valvesOpenCount">0</span>
+                            </div>
+                            <div class="valve-status-item">
+                                <span class="valve-status-label">Valves Closed:</span>
+                                <span class="valve-status-value" id="valvesClosedCount">0</span>
+                            </div>
+                            <div class="valve-status-item">
+                                <span class="valve-status-label">Last Operation:</span>
+                                <span class="valve-status-value" id="lastOperationTime">--:--</span>
+                            </div>
+                        </div>
+                        <table class="valve-control-table">
+                            <thead>
+                                <tr>
+                                    <th>Valve ID</th>
+                                    <th>Section</th>
+                                    <th>Status</th>
+                                    <th>Last Changed</th>
+                                    <th>Toggle</th>
+                                </tr>
+                            </thead>
+                            <tbody id="valveControlList">
+                                <!-- Valve control entries will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Automation Rules -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Automation Rules</h3>
+                            <div class="chart-actions">
+                                <button id="addRuleBtn" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Add Rule
+                                </button>
+                            </div>
+                        </div>
+                        <div class="automation-rules-container">
+                            <table class="automation-rules-table">
+                                <thead>
+                                    <tr>
+                                        <th>Condition</th>
+                                        <th>Action</th>
+                                        <th>Status</th>
+                                        <th>Last Triggered</th>
+                                        <th>Controls</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="automationRulesList">
+                                    <!-- Automation rules will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <button id="closeNotifications"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be dynamically added here -->
+        </div>
+        <div class="notification-footer">
+            <button class="mark-all-read" id="markAllRead">Mark All as Read</button>
+            <a href="#alerts" class="view-all-notifications">View All</a>
+        </div>
+    </div>
+
+    <!-- Modal for alerts, sensor details and rules -->
+    <div class="modal" id="generalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Details</h3>
+                <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

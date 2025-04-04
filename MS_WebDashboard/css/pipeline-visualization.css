@@ -1,0 +1,618 @@
+/* Additional styles for the sensor map pipeline visualization */
+
+/* Pipeline-specific styles */
+.pipeline-visualization {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    padding: 20px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-md);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  
+  .pipeline-section {
+    position: relative;
+    margin-bottom: 40px;
+    height: 60px;
+  }
+  
+  .pipeline-section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gray-700);
+    margin-bottom: 10px;
+    position: absolute;
+    left: 0;
+    top: -18px;
+  }
+  
+  .section-pipe {
+    height: 20px;
+    background: linear-gradient(to right, var(--gray-400), var(--gray-500), var(--gray-400));
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    top: 20px;
+  }
+  
+  .sensor-point {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    top: -8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 2;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .sensor-point:hover {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 1), 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+  }
+  
+  .sensor-point[data-type="temperature"][data-status="online"] {
+    background-color: #ef4444;
+    background: radial-gradient(circle at 30% 30%, #fd868a, #ef4444);
+  }
+  
+  .sensor-point[data-type="pressure"][data-status="online"] {
+    background-color: #3b82f6;
+    background: radial-gradient(circle at 30% 30%, #7eb1ff, #3b82f6);
+  }
+  
+  .sensor-point[data-status="warning"] {
+    background-color: #f59e0b;
+    background: radial-gradient(circle at 30% 30%, #fac151, #f59e0b);
+  }
+  
+  .sensor-point[data-status="offline"] {
+    background-color: #6b7280;
+    background: radial-gradient(circle at 30% 30%, #9ca3af, #6b7280);
+  }
+  
+  .valve-point {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    top: 22px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .valve-point::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.7);
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  
+  .valve-point:hover {
+    transform: translateY(-50%) scale(1.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .valve-point[data-status="open"] {
+    background-color: #10b981;
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  
+  .valve-point[data-status="closed"] {
+    background-color: #ef4444;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+  }
+  
+  /* Sensor positioning */
+  .sensor-point[data-sensor-id="A1"] { left: 15%; }
+  .sensor-point[data-sensor-id="A2"] { left: 45%; }
+  .sensor-point[data-sensor-id="A3"] { left: 75%; }
+  .sensor-point[data-sensor-id="B1"] { left: 20%; }
+  .sensor-point[data-sensor-id="B2"] { left: 50%; }
+  .sensor-point[data-sensor-id="B3"] { left: 80%; }
+  .sensor-point[data-sensor-id="C1"] { left: 25%; }
+  .sensor-point[data-sensor-id="C2"] { left: 55%; }
+  .sensor-point[data-sensor-id="C3"] { left: 85%; }
+  
+  .valve-point[data-valve-id="VA1"] { left: 60%; }
+  .valve-point[data-valve-id="VB1"] { left: 35%; }
+  .valve-point[data-valve-id="VC1"] { left: 70%; }
+  
+  /* Sensor map styles */
+  .sensor-map {
+    height: 350px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .map-placeholder {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Tooltip styles for sensor points */
+  .sensor-tooltip {
+    position: absolute;
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    padding: 10px;
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.2s;
+    width: 200px;
+  }
+  
+  .sensor-tooltip.visible {
+    opacity: 1;
+  }
+  
+  .sensor-tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .sensor-tooltip-title {
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+  
+  .sensor-tooltip-value {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+  
+  .sensor-tooltip-label {
+    color: var(--gray-600);
+    font-size: 12px;
+  }
+  
+  .sensor-tooltip-data {
+    font-weight: 500;
+    color: var(--gray-800);
+    font-size: 12px;
+  }
+  
+  /* Map legend styles */
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-top: 15px;
+    gap: var(--spacing-md);
+    justify-content: center;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: var(--gray-700);
+  }
+  
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    display: inline-block;
+  }
+  
+  .legend-dot.temperature-online { background-color: #ef4444; }
+  .legend-dot.pressure-online { background-color: #3b82f6; }
+  .legend-dot.sensor-warning { background-color: #f59e0b; }
+  .legend-dot.sensor-offline { background-color: #6b7280; }
+  .legend-dot.valve-open { background-color: #10b981; }
+  .legend-dot.valve-closed { background-color: #ef4444; }
+  
+  /* Controls for map view */
+  .map-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .map-control-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--gray-700);
+  }
+  
+  .map-control-btn:hover {
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+  }
+  
+  /* Table styles */
+  .sensor-table-container, .alerts-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .sensor-table, .alerts-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .sensor-table th, .sensor-table td,
+  .alerts-table th, .alerts-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .sensor-table th, .alerts-table th {
+    background-color: var(--gray-100);
+    font-weight: 600;
+    color: var(--gray-700);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .sensor-table tbody tr:hover, .alerts-table tbody tr:hover {
+    background-color: var(--gray-100);
+  }
+  
+  .sensor-status, .alert-status {
+    display: inline-block;
+    padding: 2px var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+  
+  .sensor-status.online, .alert-status.resolved {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .sensor-status.warning, .alert-status.acknowledged {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+  
+  .sensor-status.offline, .alert-status.active {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .sensor-status.maintenance {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .battery-indicator {
+    width: 40px;
+    height: 10px;
+    background-color: var(--gray-200);
+    border-radius: var(--border-radius-sm);
+    display: inline-block;
+    margin-right: var(--spacing-xs);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .battery-level {
+    height: 100%;
+    background-color: #10b981;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  
+  .battery-level.warning {
+    background-color: #f59e0b;
+  }
+  
+  .battery-level.critical {
+    background-color: #ef4444;
+  }
+  
+  .table-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .pagination-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+  }
+  
+  .pagination-btn:hover:not(:disabled) {
+    background-color: var(--gray-200);
+  }
+  
+  .pagination-btn:disabled {
+    color: var(--gray-400);
+    cursor: not-allowed;
+  }
+  
+  #paginationInfo, #alertsPaginationInfo {
+    margin: 0 var(--spacing-md);
+    color: var(--gray-600);
+    font-size: var(--font-size-sm);
+  }
+  
+  /* Analytics section styles */
+  .date-range-picker {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .date-range-picker:hover {
+    border-color: var(--primary-color);
+  }
+  
+  .view-toggles {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  
+  .view-toggle-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    color: var(--gray-700);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .view-toggle-btn:hover {
+    border-color: var(--gray-400);
+  }
+  
+  .view-toggle-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
+  .analytics-view-container {
+    margin-top: var(--spacing-lg);
+  }
+  
+  .insights-container {
+    margin-top: var(--spacing-lg);
+  }
+  
+  .insights-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+  }
+  
+  .insight-card {
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    border-left: 4px solid var(--primary-color);
+    height: 100%;
+  }
+  
+  .insight-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .insight-header i {
+    color: var(--primary-color);
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+  }
+  
+  .insight-header h4 {
+    margin: 0;
+    color: var(--gray-800);
+  }
+  
+  .insight-content {
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .insight-content p {
+    margin-bottom: 0;
+  }
+  
+  .insight-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .insight-confidence {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .insight-confidence.high {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+  
+  .insight-confidence.medium {
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.1);
+  }
+  
+  .insight-confidence.low {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+  
+  /* Modals and Details */
+  .alert-detail-content, .sensor-detail-content {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .detail-row {
+    display: flex;
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  .detail-label {
+    width: 150px;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+  
+  .detail-value {
+    color: var(--gray-800);
+    flex: 1;
+  }
+  
+  .alert-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+  }
+  
+  .action-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  #acknowledgeAlertBtn {
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+    border: none;
+  }
+  
+  #resolveAlertBtn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+  }
+  
+  #acknowledgeAlertBtn:hover {
+    background-color: var(--gray-300);
+  }
+  
+  #resolveAlertBtn:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  /* Responsive adjustments for pipeline visualization */
+  @media (max-width: 768px) {
+    .pipeline-section {
+      margin-bottom: 30px;
+      height: 50px;
+    }
+    
+    .sensor-map {
+      height: 300px;
+    }
+    
+    .map-legend {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+    }
+    
+    .legend-item {
+      margin-right: 0;
+      font-size: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .sensor-map {
+      height: 250px;
+    }
+    
+    .map-legend {
+      padding: 5px;
+    }
+    
+    .legend-item {
+      font-size: 9px;
+      margin-bottom: 2px;
+    }
+    
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+    }
+  }
