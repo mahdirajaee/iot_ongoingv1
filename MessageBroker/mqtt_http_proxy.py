@@ -15,6 +15,12 @@ Options:
     --interval       Test data generation interval in seconds (default: 3.0)
 """
 
+# Apply the compatibility patch for Python 3.13+ before importing CherryPy
+import sys
+if sys.version_info >= (3, 13):
+    from monkey_patch import apply_patch
+    apply_patch()
+
 import cherrypy
 import paho.mqtt.client as mqtt
 import json
@@ -343,4 +349,4 @@ def main():
         cherrypy.engine.stop()
 
 if __name__ == "__main__":
-    main() 
+    main()

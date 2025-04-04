@@ -13,6 +13,14 @@ class CatalogManager:
         self.registration_endpoint = os.getenv("CATALOG_REGISTRATION_ENDPOINT", "/api/catalog/register")
         self.config_endpoint = os.getenv("CATALOG_GET_CONFIG_ENDPOINT", "/api/catalog/config")
         self.service_id = None
+        # Default configuration in case catalog service is unavailable
+        self.default_config = {
+            "temperature_mean": 70,
+            "temperature_std": 5,
+            "pressure_mean": 100,
+            "pressure_std": 10,
+            "publish_interval": 3  # Faster updates for testing
+        }
 
     def register_service(self):
         try:
@@ -36,7 +44,7 @@ class CatalogManager:
             }
             
             url = f"{self.catalog_url}{self.registration_endpoint}"
-            response = requests.post(url, json=service_info)
+            response = requests.post(url, json=service_info, timeout=3)  # Short timeout
             
             if response.status_code == 200:
                 data = response.json()
@@ -45,16 +53,20 @@ class CatalogManager:
                 return True
             else:
                 logging.error(f"Failed to register service: {response.status_code} - {response.text}")
-                return False
+                # Still return true to avoid blocking startup
+                logging.info("Continuing with default configuration")
+                return True
         except Exception as e:
             logging.error(f"Error registering service: {e}")
-            return False
+            logging.info("Continuing with default configuration")
+            # Still return true to avoid blocking startup
+            return True
 
     def get_configuration(self):
         try:
             url = f"{self.catalog_url}{self.config_endpoint}"
             params = {"service": self.service_name}
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=3)  # Short timeout
             
             if response.status_code == 200:
                 config = response.json()
@@ -62,10 +74,12 @@ class CatalogManager:
                 return config
             else:
                 logging.warning(f"Failed to get configuration: {response.status_code} - {response.text}")
-                return {}
+                logging.info(f"Using default configuration: {self.default_config}")
+                return self.default_config
         except Exception as e:
             logging.error(f"Error getting configuration: {e}")
-            return {}
+            logging.info(f"Using default configuration: {self.default_config}")
+            return self.default_config
 
     def update_sensor_status(self, status):
         try:

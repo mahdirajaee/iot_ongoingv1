@@ -6,6 +6,11 @@ import signal
 import sys
 from dotenv import load_dotenv
 
+# Apply the compatibility patch for Python 3.13+ before importing any library that uses cgi
+if sys.version_info >= (3, 13):
+    from monkey_patch import apply_patch
+    apply_patch()
+
 from services.catalog_manager import CatalogManager
 from services.actuator_service import ActuatorService
 from services.mqtt_service import MQTTService

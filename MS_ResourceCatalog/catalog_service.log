@@ -13,3 +13,20 @@
 2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus EXITING
 2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Bus EXITED
 2025-03-31 16:06:01,970 - cherrypy.error - INFO - [31/Mar/2025:16:06:01] ENGINE Waiting for child threads to terminate...
+2025-04-04 16:44:21,149 - CatalogService - INFO - Starting Resource Catalog service with Python 3.13.1 (v3.13.1:06714517797, Dec  3 2024, 14:00:22) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-04-04 16:44:21,149 - CatalogService - INFO - Using storage file: registry_data.json
+2025-04-04 16:44:21,150 - cherrypy.error - INFO - [04/Apr/2025:16:44:21] ENGINE Bus STARTING
+2025-04-04 16:44:21,150 - cherrypy.error - INFO - [04/Apr/2025:16:44:21] ENGINE Started monitor thread 'Autoreloader'.
+2025-04-04 16:44:21,257 - cherrypy.error - INFO - [04/Apr/2025:16:44:21] ENGINE Serving on http://127.0.0.1:8080
+2025-04-04 16:44:21,257 - cherrypy.error - INFO - [04/Apr/2025:16:44:21] ENGINE Bus STARTED
+2025-04-04 16:44:21,257 - CatalogService - INFO - Resource Catalog service started on http://0.0.0.0:8080
+2025-04-04 16:44:45,196 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:44:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:45:45,224 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:45:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:46:45,248 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:46:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:47:45,280 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:47:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:48:45,307 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:48:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:49:45,327 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:49:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:50:45,351 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:50:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:51:45,389 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:51:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:52:45,430 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:52:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"
+2025-04-04 16:53:45,473 - cherrypy.access.4401831888 - INFO - 127.0.0.1 - - [04/Apr/2025:16:53:45] "POST /api/v1/services/register HTTP/1.1" 404 790 "" "python-requests/2.31.0"

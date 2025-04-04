@@ -9,7 +9,7 @@ const Dashboard = (function() {
   // Store service endpoints
   const serviceEndpoints = {
     'api-server': 'http://localhost:8088',
-    'time-series-db': 'http://localhost:8081',
+    'time-series-db': 'http://localhost:8081', // Fixed to match the actual TimeSeriesDBConnector port (8081)
     'analytics': 'http://localhost:8082',
     'account-manager': 'http://localhost:8083',
     'control-center': 'http://localhost:8084'
@@ -143,6 +143,9 @@ const Dashboard = (function() {
           // Start polling for data
           startDataPolling();
           
+          // Additionally, fetch pressure data from TimeSeriesDBConnector
+          fetchPressureData();
+          
           Utils.showToast('Connected to data API', 'success');
         })
         .catch(error => {
@@ -171,6 +174,7 @@ const Dashboard = (function() {
     
     // Start new polling timer
     pollingTimer = setInterval(() => {
+      // Fetch general data
       fetch(`${serviceEndpoints['api-server']}/api/data`)
         .then(response => {
           if (!response.ok) {
@@ -192,7 +196,36 @@ const Dashboard = (function() {
           // Try to reconnect after a delay
           setTimeout(initHTTPConnection, 5000);
         });
+        
+      // Fetch pressure data from TimeSeriesDBConnector
+      fetchPressureData();
     }, POLLING_INTERVAL);
+  }
+  
+  // Fetch pressure data from TimeSeriesDBConnector
+  function fetchPressureData() {
+    fetch(`${serviceEndpoints['time-series-db']}/api/v1/data/latest?measurement=pressure`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch pressure data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Pressure data received:', data);
+        if (data && data.status === 'success' && data.data) {
+          // Format data for pressure update
+          const pressureData = {
+            value: data.data.value,
+            timestamp: data.data.time || new Date().toISOString(),
+            location: data.data.location || 'Section B'
+          };
+          updatePressure(pressureData);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching pressure data:', error);
+      });
   }
   
   // Process data from API

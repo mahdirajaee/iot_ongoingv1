@@ -17,7 +17,18 @@ class MQTTService:
         self.setup_client()
 
     def setup_client(self):
-        self.client = mqtt.Client(client_id=self.client_id)
+        # Updated to support Python 3.13+ with required callback_api_version parameter
+        import sys
+        if sys.version_info >= (3, 13):
+            # For Python 3.13+, use VERSION2 callback API
+            self.client = mqtt.Client(
+                client_id=self.client_id,
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION2
+            )
+        else:
+            # For older Python versions, use the original initialization
+            self.client = mqtt.Client(client_id=self.client_id)
+            
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.on_disconnect = self.on_disconnect
@@ -38,21 +49,33 @@ class MQTTService:
             self.client.disconnect()
             logging.info("Disconnected from MQTT broker")
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
+        """
+        Callback for when the client connects to the broker.
+        The properties parameter is used with MQTT v5 only (Python 3.13+).
+        """
         if rc == 0:
             logging.info("Connected to MQTT broker")
             self.client.subscribe(self.topic_valve)
             logging.info(f"Subscribed to {self.topic_valve}")
         else:
             logging.error(f"Failed to connect to MQTT broker with result code {rc}")
-
-    def on_disconnect(self, client, userdata, rc):
+            
+    def on_disconnect(self, client, userdata, rc, properties=None):
+        """
+        Callback for when the client disconnects from the broker.
+        The properties parameter is used with MQTT v5 only (Python 3.13+).
+        """
         if rc != 0:
             logging.warning(f"Unexpected disconnection from MQTT broker with result code {rc}")
             time.sleep(5)
             self.connect()
 
-    def on_message(self, client, userdata, msg):
+    def on_message(self, client, userdata, msg, properties=None):
+        """
+        Callback for when a message is received from the broker.
+        The properties parameter is used with MQTT v5 only (Python 3.13+).
+        """
         try:
             topic = msg.topic
             payload = json.loads(msg.payload.decode())

@@ -9,7 +9,6 @@ import requests
 import sys
 if sys.version_info >= (3, 13):
     from utils.cherrypy_compat import *
-    
 import cherrypy
 from dotenv import load_dotenv
 from services.influxdb_service import InfluxDBService
