@@ -9,10 +9,8 @@ import logging
 from typing import Dict, Any, Optional
 import json 
 
-# Apply patches for Python 3.13+ compatibility
+# Python 3.13+ compatibility is now handled by CherryPy 18.9.0
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from monkey_patch import apply_patches
-apply_patches()
 
 import cherrypy
 from dotenv import load_dotenv

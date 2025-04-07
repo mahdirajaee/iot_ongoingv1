@@ -1,4 +1,4 @@
-cherrypy==18.8.0
+cherrypy==18.9.0
 paho-mqtt==2.2.1
 influxdb-client==1.36.1
 python-dotenv==1.0.0

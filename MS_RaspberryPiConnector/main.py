@@ -6,10 +6,7 @@ import signal
 import sys
 from dotenv import load_dotenv
 
-# Apply the compatibility patch for Python 3.13+ before importing any library that uses cgi
-if sys.version_info >= (3, 13):
-    from monkey_patch import apply_patch
-    apply_patch()
+# CherryPy 18.9.0 now handles Python 3.13+ compatibility
 
 from services.catalog_manager import CatalogManager
 from services.actuator_service import ActuatorService

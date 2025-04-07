@@ -1,4 +1,4 @@
-cherrypy
+cherrypy==18.9.0
 paho-mqtt
 requests
 python-dotenv
